@@ -19,7 +19,7 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     const userData = {username,password}
-    console.log(username);
+    console.log('userData=>',userData);
 
 
     try{
@@ -28,7 +28,7 @@ const Login = () => {
       localStorage.setItem('refreshToken', response.data.refresh)
       console.log("Login Successful");
       setIsLoggedIn(true)
-      navigate('/')
+      navigate('/dashboard')
     }catch(error){
       console.error('Invalid Credentials');
       setError('Invalid Credentials')
