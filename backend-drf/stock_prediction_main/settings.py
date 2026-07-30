@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 from pathlib import Path
 from decouple import config
 from datetime import timedelta
+import os
 
 
 
@@ -30,7 +31,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*",'127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -47,12 +48,13 @@ INSTALLED_APPS = [
     'api',
     "corsheaders",
     'rest_framework_simplejwt',
+    
 
 ]
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
-
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -67,7 +69,7 @@ ROOT_URLCONF = "stock_prediction_main.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR.parent, 'frontend/dist')],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -122,6 +124,20 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+# Where Django will assemble everything for production deployment
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') 
+# Point to your React asset distribution directory
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR.parent, 'frontend/dist'),
+]
+
+
+# 6. Configure WhiteNoise to cache assets efficiently
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 
 CORS_ALLOWED_ORIGINS = [

@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+
+**/ml_models/*.pkl
+**/ml_models/automation_cron.log
