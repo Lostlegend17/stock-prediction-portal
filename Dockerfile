@@ -44,5 +44,6 @@ EXPOSE 8000
 #
 # Instead, collectstatic runs at container startup below, once Render
 # has injected the real environment variables, then gunicorn starts.
-CMD python manage.py collectstatic --noinput --clear && \
+CMD python manage.py migrate --noinput && \
+    python manage.py collectstatic --noinput --clear && \
     gunicorn --bind 0.0.0.0:8000 stock_prediction_main.wsgi:application
