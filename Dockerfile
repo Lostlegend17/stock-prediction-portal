@@ -18,9 +18,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Install python dependencies using the exact hyphen folder path
+# Install python dependencies with strict low-memory optimization flags
 COPY backend-drf/requirements.txt ./backend-drf/
-RUN pip install --no-cache-dir -r backend-drf/requirements.txt
+RUN pip install --no-cache-dir --src /tmp/pip-src --no-compile -r backend-drf/requirements.txt
 
 # Copy backend app source code
 COPY backend-drf/ ./backend-drf/
