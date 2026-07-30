@@ -10,15 +10,15 @@ from rest_framework import status
 
 import numpy as np
 from django.apps import apps
-from .apps import AccountsConfig  # Direct class import ensures strict global memory visibility
+from .apps import AccountsConfig  
 
-# Handles account creation validations
+
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UseSerializers
     permission_classes = [AllowAny]
 
-# Simple security route to confirm token validity on component mount
+
 class ProtectedView(APIView):
     permission_classes = [IsAuthenticated]
     
@@ -26,12 +26,12 @@ class ProtectedView(APIView):
         response = {'status': 'Request was permitted'}
         return Response(response)
 
-# 🧠 The Main Machine Learning Prediction Endpoint View
+# Main Machine Learning Prediction Endpoint View
 class StockPredictionAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        # 1. Clean and normalize the requested ticker input string
+        # Clean and normalize the requested ticker input string
         ticker = str(request.data.get('stock_ticker', 'AAPL')).strip().upper()
         days = int(request.data.get('days', 7))
         
@@ -41,13 +41,12 @@ class StockPredictionAPIView(APIView):
         
         chart_list = []
         
-        # 🌟 STRATEGY A: RUN DEEP LEARNING MULTI-FEATURE LSTM FORECASTS (WITH SMA & RSI)
+        # Runing deep learning multi-feature LSTM  (with SMA & RSI)
         if lstm_pack:
             model = lstm_pack['model']
             scaler = lstm_pack['scaler']
             last_price = lstm_pack.get('last_price', 150.0)
             
-            # ⚠️ FIX: Change 'seed_data' to 'last_30_days_scaled' to match apps.py keys precisely!
             current_sequence = np.copy(lstm_pack['last_30_days_scaled'])
             
             chart_list.append({
@@ -55,9 +54,8 @@ class StockPredictionAPIView(APIView):
                 "price": round(float(last_price), 2)
             })
             
-            # Run the deep learning sliding evaluation loop
             for step in range(1, days + 1):
-                # ⚠️ FIX: Structure shape strictly matching [1, 30, 3] required by your Keras LSTM input layer
+                
                 input_tensor = np.reshape(current_sequence, (1, current_sequence.shape[0], current_sequence.shape[1]))
                 
                 # Predict next day's scaled closing price
@@ -78,7 +76,7 @@ class StockPredictionAPIView(APIView):
                     "price": round(real_usd_price, 2)
                 })
                 
-                # SLIDING WINDOW SHIFT: Append 3 new scaled feature columns to tail end, drop the oldest day row index
+                # sliding window shift: Append 3 new scaled feature columns to tail end, drop the oldest day row index
                 new_day_features = np.array([[scaled_close_value, simulated_sma, simulated_rsi]])
                 current_sequence = np.append(current_sequence[1:], new_day_features, axis=0)
             
@@ -86,13 +84,13 @@ class StockPredictionAPIView(APIView):
             confidence = max(55.0, round(92.0 - (days * 1.2), 1))
             summary = f"The advanced LSTM deep learning neural network processed recurrent layers, rolling SMA lines, and RSI momentum metrics to project a target evaluation point of ${predicted_price} for {ticker} over a {days}-day prediction horizon."
 
-        # 🌟 STRATEGY B: RUN TRADITIONAL LINEAR REGRESSION FORECASTS (FALLBACK)
+        # LINEAR REGRESSION forecasts
         elif linear_pack:
             model = linear_pack['model']
             last_index = linear_pack['last_index']
             last_price = linear_pack.get('last_price', 150.0)
             
-            # Baseline entry
+            
             chart_list.append({
                 "day": "Today",
                 "price": round(float(last_price), 2)
