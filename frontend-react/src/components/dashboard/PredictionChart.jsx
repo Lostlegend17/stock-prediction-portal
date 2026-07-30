@@ -13,7 +13,7 @@ const PredictionChart = ({ result }) => {
                     </h4>
                     <hr className="border-secondary" />
                     
-                    {/* AreaChart Graph Canvas Component */}
+                    {/* AreaChart Graph Component */}
                     <div className="my-4" style={{ width: '100%', height: 220 }}>
                         <ResponsiveContainer>
                             <AreaChart data={result.chart_points} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
