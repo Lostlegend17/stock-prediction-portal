@@ -16,7 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include, re_path
-from django.views.generic import TemplateView
+# from django.views.generic import TemplateView
+
+from django.shortcuts import render # 👈 Import render to handle static routing mapping
+
+# This function forces Django to resolve index.html through the WhiteNoise asset engine
+def render_react_app(request):
+    return render(request, 'index.html')
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -25,8 +31,8 @@ urlpatterns = [
     path('api/v1/', include('api.urls') ),
     
     # 2. Serves your compiled React app for the main homepage route
-    path('', TemplateView.as_view(template_name='index.html'), name='frontend'),
+    path('', render_react_app, name='frontend'),
     
-    # 3. Catch-all: Directs any frontend routing paths (like /dashboard) to React Router
-    re_path(r'^.*$', TemplateView.as_view(template_name='index.html')),
+    # 3. Catch-all: Directs any deep client-side routes (like /dashboard) back to React Router
+    re_path(r'^.*$', render_react_app),
 ]

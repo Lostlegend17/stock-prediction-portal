@@ -38,7 +38,6 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
-    #  FIX 1: WhiteNoise is now placed safely below SecurityMiddleware
     "whitenoise.middleware.WhiteNoiseMiddleware", 
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -53,8 +52,8 @@ ROOT_URLCONF = "stock_prediction_main.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        #  FIX 2: Changed 'frontend' to 'frontend-react'
-        "DIRS": [os.path.join(BASE_DIR.parent, 'frontend-react/dist')],
+        # 🎯 FIX 1: Point directly to the production folder created inside the container
+        "DIRS": [os.path.join(BASE_DIR, 'frontend_react_dist')],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -92,12 +91,15 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = "static/"
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-#  FIX 3: Changed 'frontend' to 'frontend-react' here as well
+# 🎯 FIX 2: Point static collection straight to the internal container directory
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR.parent, 'frontend-react/dist'),
+    os.path.join(BASE_DIR, 'frontend_react_dist'),
 ]
+
+# 🎯 FIX 3: Turn off WhiteNoise root domain mounting so it checks our template configuration
+WHITENOISE_ROOT = None
 
 # Configure WhiteNoise to cache assets efficiently
 STORAGES = {
