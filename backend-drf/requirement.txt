@@ -7,10 +7,9 @@ whitenoise==6.7.0
 gunicorn==23.0.0
 tensorflow-cpu>=2.15.0
 pandas
-numpy
+numpy>=1.26.0,<2.0.0
 scikit-learn
 joblib
 yfinance
 psycopg2-binary>=2.9.9
 dj-database-url>=2.1.0
-
