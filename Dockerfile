@@ -8,6 +8,7 @@ RUN npm run build
 
 # --- Stage 2: Bundle Everything Into Python ---
 FROM python:3.11-slim
+
 ENV PYTHONUNBUFFERED=1
 ENV TF_CPP_MIN_LOG_LEVEL=2
 
@@ -32,11 +33,16 @@ COPY --from=frontend-builder /app/frontend-react/dist/ /app/backend-drf/frontend
 # Step inside the backend directory to compile assets
 WORKDIR /app/backend-drf
 
-# 🎯 THE BYPASS FIX: Force create target structural folders and bypass non-critical static warnings
-RUN mkdir -p /app/backend-drf/staticfiles
-RUN python manage.py collectstatic --noinput --clear --no-post-process || true
-
 EXPOSE 8000
 
-# Execute server engine pipeline
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "stock_prediction_main.wsgi:application"]
+# NOTE: collectstatic is intentionally NOT run here at build time.
+# SECRET_KEY / DEBUG come from environment variables that Render only
+# injects at container runtime, not during `docker build`. Running
+# collectstatic here would fail (silently, due to `|| true`) because
+# those env vars aren't available yet, leaving staticfiles/ empty and
+# causing your CSS/JS to 404 -> fall through to index.html -> MIME errors.
+#
+# Instead, collectstatic runs at container startup below, once Render
+# has injected the real environment variables, then gunicorn starts.
+CMD python manage.py collectstatic --noinput --clear && \
+    gunicorn --bind 0.0.0.0:8000 stock_prediction_main.wsgi:application
