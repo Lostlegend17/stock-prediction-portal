@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
-import axiosInstance from '../axiosInstance'; // <-- Change this path if necessary
+import axiosInstance from '../axiosInstance';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
+    const navigate = useNavigate();
+
     const [username, setUserName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -67,9 +70,21 @@ const Register = () => {
                             )}
 
                             {success && (
-                                <div className="alert alert-success">
-                                    Registration Successful!
-                                </div>
+                                <>
+                                    <div className="alert alert-success">
+                                        Registration Successful!
+                                    </div>
+
+                                    <div className="d-grid mb-3">
+                                        <button
+                                            type="button"
+                                            className="btn btn-success"
+                                            onClick={() => navigate('/login')}
+                                        >
+                                            Go to Login
+                                        </button>
+                                    </div>
+                                </>
                             )}
 
                             <div className="mb-3">
@@ -120,23 +135,24 @@ const Register = () => {
                                 )}
                             </div>
 
-                            {loading ? (
-                                <button
-                                    type="submit"
-                                    className="btn btn-info d-block mx-auto"
-                                    disabled
-                                >
-                                    <FontAwesomeIcon icon={faSpinner} spin />{' '}
-                                    Please wait...
-                                </button>
-                            ) : (
-                                <button
-                                    type="submit"
-                                    className="btn btn-info d-block mx-auto"
-                                >
-                                    Register
-                                </button>
-                            )}
+                            {!success &&
+                                (loading ? (
+                                    <button
+                                        type="submit"
+                                        className="btn btn-info d-block mx-auto"
+                                        disabled
+                                    >
+                                        <FontAwesomeIcon icon={faSpinner} spin />{' '}
+                                        Please wait...
+                                    </button>
+                                ) : (
+                                    <button
+                                        type="submit"
+                                        className="btn btn-info d-block mx-auto"
+                                    >
+                                        Register
+                                    </button>
+                                ))}
                         </form>
                     </div>
                 </div>
