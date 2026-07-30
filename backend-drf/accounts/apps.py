@@ -7,49 +7,44 @@ class AccountsConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = "accounts"
 
-    # 🌟 BOTH cache maps initialized to prevent views.py lookup exceptions
+    
     loaded_lstm_models = {}
     loaded_models = {} 
 
     def ready(self):
-        # 🛡️ GUARD CLAUSE: Stops Django's auto-reloader from running this initialization twice
+        
         if os.environ.get('RUN_MAIN') != 'true':
             return 
 
-        # Step cleanly out of the accounts/ app folder up to root level
+        
         BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        # Target your self-contained ml_models directory layout
         ml_folder = os.path.join(BASE_DIR, 'ml_models') 
         
-        # 🌟 Expanded to all 5 tickers matching your training pipeline loop registry
         target_tickers = ["AAPL", "TSLA", "NVDA", "MSFT", "AMZN"]
         
         print("\n" + "="*50)
-        print("🧠 INITIALIZING DEEP LEARNING LSTM ENGINE FRAMEWORK...")
+        print("Initializing deep learning LSTM engine framework...")
         
         for ticker in target_tickers:
-            # 🌟 Matches your new file export structure rule perfectly
             model_path = os.path.join(ml_folder, f"{ticker}_lstm_model.pkl")
             
             if os.path.exists(model_path):
                 try:
                     raw_pack = joblib.load(model_path)
                     
-                    # Rebuild the TensorFlow neural architecture layers directly into RAM cache
                     model = model_from_json(raw_pack['model_architecture'])
                     model.set_weights(raw_pack['model_weights'])
                     
-                    # Store variables directly into your Class static variables matrix
                     AccountsConfig.loaded_lstm_models[ticker] = {
                         'model': model,
                         'scaler': raw_pack['scaler'],
                         'last_30_days_scaled': raw_pack['last_30_days_scaled'],
                         'last_price': raw_pack['last_price']
                     }
-                    print(f"✅ Loaded Neural Memory: {ticker} LSTM tracking operational.")
+                    print(f"Loaded Neural Memory: {ticker} LSTM tracking operational.")
                 except Exception as e:
-                    print(f"❌ Failed deserializing neural matrix for {ticker}: {e}")
+                    print(f"Failed deserializing neural matrix for {ticker}: {e}")
             else:
-                print(f"⚠️ Model artifact missing: {ticker} not found at {model_path}")
+                print(f"Model artifact missing: {ticker} not found at {model_path}")
                 
         print("="*50 + "\n")
