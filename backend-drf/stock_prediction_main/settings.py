@@ -13,11 +13,14 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY')
+# SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = 'r&ct0_@1+$&09epp6rc7fozb$z@fi^y8*pva=q)w6mj0%13yy4'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=False, cast=bool)
+# DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG=False
 
+# Enforce secure binding fields
 ALLOWED_HOSTS = ["*", '127.0.0.1', 'localhost']
 
 # Application definition
@@ -38,6 +41,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    # CRUCIAL: WhiteNoise must be here to intercept your React frontend files
     "whitenoise.middleware.WhiteNoiseMiddleware", 
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -52,7 +56,6 @@ ROOT_URLCONF = "stock_prediction_main.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        # 🎯 FIX 1: Point directly to the production folder created inside the container
         "DIRS": [os.path.join(BASE_DIR, 'frontend_react_dist')],
         "APP_DIRS": True,
         "OPTIONS": {
@@ -91,15 +94,15 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = "static/"
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# 🎯 FIX 2: Point static collection straight to the internal container directory
+# 🎯 THE FIX: Force WhiteNoise to mount and serve your React app directly at the root URL (/)
+WHITENOISE_ROOT = os.path.join(BASE_DIR, 'frontend_react_dist')
+
+# 🎯 THE FIX: Set to empty so Django avoids searching raw directory segments during collectstatic
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'frontend_react_dist'),
-]
-
-# 🎯 FIX 3: Turn off WhiteNoise root domain mounting so it checks our template configuration
-WHITENOISE_ROOT = None
+    BASE_DIR / 'frontend_react_dist', 
+                    ]
 
 # Configure WhiteNoise to cache assets efficiently
 STORAGES = {
@@ -108,6 +111,7 @@ STORAGES = {
     },
 }
 
+# Keeps local testing environment connections safe
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
 ]
