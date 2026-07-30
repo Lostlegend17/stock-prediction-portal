@@ -8,24 +8,23 @@ from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout
 
-# Setup absolute file positioning metrics directly to current folder context
+# Models directory setup
 MODELS_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Define full active multi-ticker registry array
+# multi-ticker registry array
 tickers = ["AAPL", "TSLA", "NVDA", "MSFT", "AMZN"]
 
-print("⚡ Starting automated cron pipeline execution from ml_models folder...")
+print("Starting automated cron pipeline execution from ml_models folder...")
 
 for current_ticker in tickers:
     try:
-        print(f"📥 Refreshing yfinance data vectors for: {current_ticker}")
+        print(f"Refreshing yfinance data vectors for: {current_ticker}")
         
         # Download recent history to provide contextual training sample balance
         df = yf.download(current_ticker, start="2020-01-01")
         if df.empty:
             continue
             
-        # 🌟 FIX: Cleanly extract the Close column and force it into a 1D numeric Series
         if isinstance(df.columns, pd.MultiIndex):
             close_series = df['Close'][current_ticker].squeeze()
         else:
@@ -88,9 +87,9 @@ for current_ticker in tickers:
         # Overwrite the existing operational file completely to refresh metrics
         filename = os.path.join(MODELS_DIR, f"{current_ticker}_lstm_model.pkl")
         joblib.dump(model_data, filename)
-        print(f"✅ Refreshed asset metrics output: {filename}")
+        print(f"Refreshed asset metrics output: {filename}")
         
     except Exception as e:
-        print(f"❌ Failed to process automated updates for {current_ticker}: {e}")
+        print(f"Failed to process automated updates for {current_ticker}: {e}")
 
-print("🎉 Nightly automation sequence successfully completed!")
+print("Nightly automation sequence successfully completed!")
