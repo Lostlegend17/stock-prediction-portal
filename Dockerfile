@@ -1,9 +1,9 @@
 # --- Stage 1: Build the React Application ---
 FROM node:20-slim AS frontend-builder
-WORKDIR /app/frontend
-COPY frontend/package*.json ./
+WORKDIR /app/frontend-react
+COPY frontend-react/package*.json ./
 RUN npm install
-COPY frontend/ ./
+COPY frontend-react/ ./
 RUN npm run build
 
 # --- Stage 2: Bundle Everything Into Python ---
@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Install python dependencies
+# Install python dependencies using the exact hyphen folder path
 COPY backend-drf/requirements.txt ./backend-drf/
 RUN pip install --no-cache-dir -r backend-drf/requirements.txt
 
@@ -26,7 +26,7 @@ RUN pip install --no-cache-dir -r backend-drf/requirements.txt
 COPY backend-drf/ ./backend-drf/
 
 # Pull down compiled React build assets from Stage 1 into the container setup
-COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
+COPY --from=frontend-builder /app/frontend-react/dist ./frontend-react/dist
 
 # Step inside the backend directory to compile assets and migrations
 WORKDIR /app/backend-drf
