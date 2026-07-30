@@ -1,0 +1,23 @@
+This Project is when I was learning React. I used the TensorFlow LSTM (Long Short-Term Memory) Neural Network Engine.
+It analyzes historical price sequences (open, high, low, close, and volume) for target equities like AAPL, TSLA, NVDA, MSFT, and AMZN to forecast potential price movements.
+
+Through the frontend dashboard (ForecastForm and PredictionChart), users don't just look at static graphs; they can actively interact with the data models.
+A user can select a specific stock ticker, input custom parameters or time horizons, and send a request to the backend. 
+The website dynamically processes the request through the specific neural model and plots a visual projection graph onto the user's dashboard interface.
+
+
+The application features a secure, full-scale registration, login, and profile structure managed via Django REST Framework and JWT (JSON Web Tokens).
+
+
+The backend is wired directly into active financial markets using a real-time scraping and fetching mechanism.
+The application automatically extracts up-to-date historical price frameworks, closing balances, and moving averages directly from financial markets.
+This ensures that when the neural network runs its processing loops, it is calculating forecasts using true, live market conditions.
+
+The website transforms complex deep learning models into an accessible consumer product. 
+It gives traders, students, or developers a clean dashboard interface to track major tech stocks, create secure user profiles, 
+and view machine-learning-driven trend analyses to help study market momentum.
+
+
+
+username: test
+password: 12345678
