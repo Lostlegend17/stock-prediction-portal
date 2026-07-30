@@ -8,16 +8,17 @@ from pathlib import Path
 from decouple import config
 from datetime import timedelta
 import os
-import dj_database_url # 👈 Make sure dj_database_url is imported
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'r&ct0_@1+$&09epp6rc7fozb$z@fi^y8*pva=q)w6mj0%13yy4'
+# Pulled from env var (Render dashboard / local .env) — never hardcode this.
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 # Enforce secure binding fields
 ALLOWED_HOSTS = ["*", '127.0.0.1', 'localhost']
@@ -40,7 +41,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware", 
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -69,20 +70,16 @@ TEMPLATES = [
 WSGI_APPLICATION = "stock_prediction_main.wsgi.application"
 
 
-# 🎯 THE AUGUST 2026 TIMELINE SAFETY NET
-# We use a strict try/catch architecture. If the PostgreSQL database link drops, 
-# expires, or triggers a timeout, Django catches the error instantly and boots SQLite.
-try:
-    postgres_url = os.environ.get('DATABASE_URL')
-    if postgres_url:
-        DATABASES = {
-            'default': dj_database_url.parse(postgres_url)
-        }
-    else:
-        raise ValueError("DATABASE_URL variable not set. Falling back to local engine.")
-except Exception as database_error:
-    # Safe fallback loop prints alert in logs and turns on local SQLite file
-    print(f"⚠️ Cloud Database Error/Expiration Catch: {database_error}")
+# Database
+# Uses Postgres (DATABASE_URL) when set (e.g. on Render). Falls back to local
+# SQLite for local development when DATABASE_URL isn't present.
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.parse(DATABASE_URL)
+    }
+else:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
@@ -109,11 +106,11 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Force WhiteNoise to mount and serve your React app directly at the root URL (/)
-WHITENOISE_ROOT = os.path.join(BASE_DIR, 'frontend_react_dist')
-
-# 🎯 FIXED LOOP PATHS: Clear this array to prevent circular dependency conflicts during compile
-STATICFILES_DIRS = []
+# Tell collectstatic where to find the built React app so it gets copied
+# into STATIC_ROOT (and served by WhiteNoise under /static/).
+STATICFILES_DIRS = [
+    BASE_DIR / 'frontend_react_dist',
+]
 
 # Configure WhiteNoise to cache assets efficiently
 STORAGES = {
