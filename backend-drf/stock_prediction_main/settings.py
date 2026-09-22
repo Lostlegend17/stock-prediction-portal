@@ -73,7 +73,7 @@ WSGI_APPLICATION = "stock_prediction_main.wsgi.application"
 # Database
 # Uses Postgres (DATABASE_URL) when set (e.g. on Render). Falls back to local
 # SQLite for local development when DATABASE_URL isn't present.
-DATABASE_URL = os.environ.get('DATABASE_URL')
+# DATABASE_URL = os.environ.get('DATABASE_URL')
 
 # if DATABASE_URL:
 #     DATABASES = {
